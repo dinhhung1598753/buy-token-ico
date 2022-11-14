@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React from "react";
 import { IPackage, IWalletInfo } from "../../_type_";
 
@@ -5,11 +6,10 @@ interface IProps {
   pak: IPackage;
   isBuying?: boolean;
   rate: number;
-  walletInfo?: IWalletInfo;
-  onBuy?: () => void;
+  onBuy: () => void;
 }
 
-export default function InvestCard({ pak }: IProps) {
+export default function InvestCard({ pak, rate, onBuy }: IProps) {
   return (
     <div className="max-w-xs h-auto md:m-5 my-5 mx-auto p-1.5 border-2 border-yellow-400 rounded-2xl">
       <img src={pak.bg} alt="bnb" className="rounded-xl" />
@@ -35,10 +35,13 @@ export default function InvestCard({ pak }: IProps) {
           </span>
         </div>
         <div className="text-center  text-gray-100">
-          Amount of coins to pay: 0,1 {pak.token}
+          Amount of coins to pay: {pak.amount / rate} {pak.token}
         </div>
         <div className="text-center text-md text-gray-800  mt-3 ">
-          <span className="block p-2  rounded-lg bg-yellow-500 font-semibold hover:cursor-pointer">
+          <span
+            className="block p-2  rounded-lg bg-yellow-500 font-semibold hover:cursor-pointer"
+            onClick={onBuy}
+          >
             Buy Now
           </span>
         </div>

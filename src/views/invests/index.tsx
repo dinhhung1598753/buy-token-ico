@@ -7,6 +7,7 @@ import CrowdSaleContract from "../../contracts/CrowdSaleContract";
 import UsdtContract from "../../contracts/UsdtContract";
 import { IPackage, IRate, IWalletInfo, TOKEN } from "../../_type_";
 import { packages } from "../../constants";
+import NotificationModal from "../../components/NotificationModal";
 
 export default function InvestView() {
   const [wallet, setWallet] = useState<IWalletInfo>();
@@ -14,48 +15,49 @@ export default function InvestView() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [pak, setPak] = useState<IPackage>();
   const [txHash, setTxHash] = useState<string>();
+  const [isOpenModal, setOpenModal] = useState<boolean>(false);
   const [web3Provider, setWeb3Provider] =
     useState<ethers.providers.Web3Provider>();
 
   const getRate = useCallback(async () => {
     const crowdContract = new CrowdSaleContract();
-    console.log("abc");
     const bnbRate = await crowdContract.getBnbRate();
     const usdtRate = await crowdContract.getUsdtRate();
-    console.log(123, bnbRate, usdtRate);
     setRate({ bnbRate, usdtRate });
   }, []);
 
   useEffect(() => {
     getRate();
-    console.log(12345);
   }, [getRate]);
 
   //   const { isOpen, onClose, onOpen } = {};
 
-  //   const handleBuyIco = async (pk: IPackage) => {
-  //     if (!web3Provider) return;
-  //     setPak(pk);
-  //     setIsProcessing(true);
-  //     let hash = "";
-  //     const crowdContract = new CrowdSaleContract(web3Provider);
-  //     if (pk.token === TOKEN.USDT) {
-  //       const usdtContract = new UsdtContract(web3Provider);
-  //       await usdtContract.approve(
-  //         crowdContract._contractAddress,
-  //         pk.amount / rate.bnbRate
-  //       );
-  //       hash = await crowdContract.buyTokenByUSDT(pk.amount);
-  //     } else {
-  //       hash = await crowdContract.buyTokenByBNB(pk.amount);
-  //     }
-  //     setTxHash(hash);
-  //     // onOpen();
-  //     try {
-  //     } catch (error) {}
-  //     setPak(undefined);
-  //     setIsProcessing(false);
-  //   };
+  const handleBuyIco = async (pk: IPackage) => {
+    if (!web3Provider || isProcessing) return;
+    setPak(pk);
+    setIsProcessing(true);
+    let hash = "";
+    const crowdContract = new CrowdSaleContract(web3Provider);
+
+    try {
+      if (pk.token === TOKEN.USDT) {
+        const usdtContract = new UsdtContract(web3Provider);
+        await usdtContract.approve(
+          crowdContract._contractAddress,
+          pk.amount / rate.usdtRate
+        );
+        hash = await crowdContract.buyTokenByUSDT(pk.amount);
+      } else {
+        hash = await crowdContract.buyTokenByBNB(pk.amount);
+      }
+      setTxHash(hash);
+      setOpenModal(true);
+    } catch (error) {
+      console.log(error);
+    }
+    setPak(undefined);
+    setIsProcessing(false);
+  };
   const onConnectMetamask = async () => {
     if (window.ethereum) {
       const provider = new ethers.providers.Web3Provider(
@@ -100,10 +102,16 @@ export default function InvestView() {
               pak={pak}
               rate={pak.token === TOKEN.BNB ? rate.bnbRate : rate.usdtRate}
               key={pak.key}
+              onBuy={() => handleBuyIco(pak)}
             />
           ))}
         </div>
       </div>
+      <NotificationModal
+        isOpen={true}
+        hash={txHash}
+        onClose={() => setOpenModal(false)}
+      />
     </div>
   );
 }
