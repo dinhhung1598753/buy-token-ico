@@ -31,7 +31,7 @@ export default function InvestCard({ pak, rate, onBuy }: IProps) {
         <div className="text-center text-xl text-yellow-300">{pak.name}</div>
         <div className="text-center text-xl text-yellow-300 m-3.5">
           <span className="inline-block p-2 border rounded-lg">
-            {pak.amount} FLP
+            {pak.amount} HUST
           </span>
         </div>
         <div className="text-center  text-gray-100">
