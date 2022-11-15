@@ -58,7 +58,7 @@ export default function InvestView() {
       }
       setTxHash({ hash, isSuccess: true });
       setOpenModal(true);
-    } catch (error) {
+    } catch (error: any) {
       setTxHash({ hash: error.message, isSuccess: false });
       setOpenModal(true);
     }
