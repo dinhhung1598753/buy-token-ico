@@ -23,3 +23,8 @@ export interface IPackage {
   bg: string;
   token: TOKEN;
 }
+
+export interface ITransactionHash {
+  hash: string;
+  isSuccess: boolean;
+}

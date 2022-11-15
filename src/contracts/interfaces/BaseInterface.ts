@@ -25,7 +25,7 @@ export default class BaseInterface {
       const recept = await tx.wait();
       return recept.transactionHash;
     } catch (err: any) {
-      throw new Error(err?.reason || `${err}`);
+      throw new Error(err?.transactionHash);
     }
   };
 

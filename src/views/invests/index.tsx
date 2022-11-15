@@ -5,7 +5,13 @@ import { showSortAddress } from "../../../utils";
 import InvestCard from "../../components/InvestCard";
 import CrowdSaleContract from "../../contracts/CrowdSaleContract";
 import UsdtContract from "../../contracts/UsdtContract";
-import { IPackage, IRate, IWalletInfo, TOKEN } from "../../_type_";
+import {
+  IPackage,
+  IRate,
+  ITransactionHash,
+  IWalletInfo,
+  TOKEN,
+} from "../../_type_";
 import { packages } from "../../constants";
 import NotificationModal from "../../components/NotificationModal";
 
@@ -14,7 +20,7 @@ export default function InvestView() {
   const [rate, setRate] = useState<IRate>({ bnbRate: 0, usdtRate: 0 });
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [pak, setPak] = useState<IPackage>();
-  const [txHash, setTxHash] = useState<string>();
+  const [txHash, setTxHash] = useState<ITransactionHash>();
   const [isOpenModal, setOpenModal] = useState<boolean>(false);
   const [web3Provider, setWeb3Provider] =
     useState<ethers.providers.Web3Provider>();
@@ -50,10 +56,11 @@ export default function InvestView() {
       } else {
         hash = await crowdContract.buyTokenByBNB(pk.amount);
       }
-      setTxHash(hash);
+      setTxHash({ hash, isSuccess: true });
       setOpenModal(true);
     } catch (error) {
-      console.log(error);
+      setTxHash({ hash: error.message, isSuccess: false });
+      setOpenModal(true);
     }
     setPak(undefined);
     setIsProcessing(false);
@@ -108,7 +115,7 @@ export default function InvestView() {
         </div>
       </div>
       <NotificationModal
-        isOpen={true}
+        isOpen={isOpenModal}
         hash={txHash}
         onClose={() => setOpenModal(false)}
       />
